@@ -1,7 +1,6 @@
 // make a input and labels for names, date, time locations and descriptions for all parties
 // should be able to store data and load it back to the html page
 //make a delete button
-const COHORT = "2311-FSA-ET-WEB-PT-SF";
 const API_URL = `https://fsa-crud-2aa9294fe819.herokuapp.com/api/2311-FSA-ET-WEB-PT-SF/events`;
 
 const state = {
@@ -19,6 +18,8 @@ async function render() {
     renderEvents();
 }
 
+render();
+
 async function getEvents() {
     try {
         const response = await fetch(API_URL);
@@ -31,20 +32,25 @@ async function getEvents() {
 
 function renderEvents() {
     if (!state.events.length) {
-    artistList.innerHTML = "<li>No Events.</li>";
-    return;
-  }
+        eventList.innerHTML = "<li>No Events.</li>";
+        return;
+    }
 
-  const eventCards = state.events.map((event) => {
+    const eventCards = state.events.map((event) => {
     const li = document.createElement("li");
     
     li.innerHTML = `
-    // <h2>${event.name}</h2>`;
-    // <h2>${event.name}</h2>
-    // <p>${event.date}</p>
-    // <p>${event.location}</p>
-    // <p>${event.description}</p>
-    // `;
+    <h2>${event.name}</h2>
+    <p>${event.date}</p>
+    <p>${event.location}</p>
+    <p>${event.description}</p>
+    `;
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete Event';
+    li.append(deleteButton);
+    deleteButton.addEventListener('click', () => deleteEvent(event.id));
+    
     return li;
   });
   eventList.replaceChildren(...eventCards);
@@ -61,20 +67,33 @@ async function addEvent(event) {
             name: addEventForm.name.value,
             description: addEventForm.description.value,
             date: new Date(addEventForm.date.value),
-            location: addEventForm.description.value,
+            location: addEventForm.location.value,
             
         }),
     })
 
-    if (!response.ok) {
-         throw new Error("Failed to create event");
-    }
+   
     render();
     }catch (error) {
         console.error(error);
     }
 }
 
-async function renderArtists(){
 
+
+async function deleteEvent(id) {
+    try {
+        const response = fetch(`${API_URL}/${id}`, {
+            method: 'DELETE',
+        });
+    render();
+    if (!response.ok) {
+      throw new Error('Event could not be deleted.');
+    }
+
+    
+
+    } catch(error) {
+        console.error(error);
+    }
 }
