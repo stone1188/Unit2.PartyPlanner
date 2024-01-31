@@ -8,10 +8,8 @@ const state = {
 }
 
 const eventList = document.querySelector("#events");
-
 const addEventForm = document.querySelector("#addEvents");
 addEventForm.addEventListener("submit", addEvent);
-
 
 async function render() {
     await getEvents();
@@ -45,7 +43,7 @@ function renderEvents() {
     <p>${event.location}</p>
     <p>${event.description}</p>
     `;
-    
+
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete Event';
     li.append(deleteButton);
@@ -60,19 +58,21 @@ function renderEvents() {
 async function addEvent(event) {
     event.preventDefault();
     try {
-    const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            name: addEventForm.name.value,
-            description: addEventForm.description.value,
-            date: new Date(addEventForm.date.value),
-            location: addEventForm.location.value,
-            
-        }),
-    })
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                name: addEventForm.name.value,
+                description: addEventForm.description.value,
+                date: new Date(addEventForm.date.value),
+                location: addEventForm.location.value,
+            }),
+        })
 
-   
+    if (!response.ok) {
+      throw new Error('Event could not be deleted.');
+    }
+
     render();
     }catch (error) {
         console.error(error);
@@ -83,16 +83,18 @@ async function addEvent(event) {
 
 async function deleteEvent(id) {
     try {
-        const response = fetch(`${API_URL}/${id}`, {
-            method: 'DELETE',
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: "DELETE",
+            headers: {"Content-Type": "application/json"}
         });
-    render();
+    
+
     if (!response.ok) {
       throw new Error('Event could not be deleted.');
     }
 
     
-
+    render();
     } catch(error) {
         console.error(error);
     }
